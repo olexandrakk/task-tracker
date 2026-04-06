@@ -1,0 +1,12 @@
+{
+  "app": {
+    "port": 3000
+  },
+  "db": {
+    "user": "postgres",
+    "host": "localhost",
+    "database": "taskdb",
+    "password": "PesPatron",
+    "port": 5432
+  }
+}
