@@ -2,10 +2,15 @@ const express = require('express');
 const { Pool } = require('pg');
 const fs = require('fs');
 const path = require('path');
+const cors = require('cors'); 
 
 const app = express();
+
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use(express.static('public'));
 
 const configPath = fs.existsSync('/etc/mywebapp/config.json') 
     ? '/etc/mywebapp/config.json' 
@@ -33,6 +38,7 @@ function sendResponse(req, res, data, htmlTemplate) {
     }
 }
 
+/*
 app.get('/', (req, res) => {
     res.send(`
         <h1>Task Tracker API</h1>
@@ -45,6 +51,7 @@ app.get('/', (req, res) => {
         </ul>
     `);
 });
+*/
 
 app.get('/health/alive', (req, res) => {
     res.status(200).send('OK');
@@ -109,6 +116,19 @@ app.post('/tasks/:id/done', async (req, res) => {
         const htmlTemplate = `<p>Статус задачі оновлено на 'done'!</p><p>ID: ${updatedTask.id}</p><a href="/tasks">Назад до списку</a>`;
         
         sendResponse(req, res, updatedTask, htmlTemplate);
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+});
+
+app.delete('/tasks/:id', async (req, res) => {
+    const taskId = req.params.id;
+    try {
+        const result = await pool.query('DELETE FROM tasks WHERE id = $1 RETURNING id', [taskId]);
+        
+        if (result.rowCount === 0) return res.status(404).send('Task not found');
+        
+        res.status(200).json({ message: 'Task deleted successfully' });
     } catch (error) {
         res.status(500).send(error.message);
     }
