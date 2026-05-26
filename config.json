@@ -4,7 +4,7 @@
   },
   "db": {
     "user": "postgres",
-    "host": "localhost",
+    "host": "db",
     "database": "taskdb",
     "password": "PesPatron",
     "port": 5432
